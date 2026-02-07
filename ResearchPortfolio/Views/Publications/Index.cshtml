@@ -1,0 +1,49 @@
+﻿@model IEnumerable<ResearchPortfolio.Models.Publication>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Публикации</h1>
+<br />
+<br />
+<br />
+<p>
+    <a asp-action="Create" class="btn btn-primary">Създай</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Abstract)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Year)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Abstract)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Year)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-success">Редактирай</a> |
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Детайли</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
