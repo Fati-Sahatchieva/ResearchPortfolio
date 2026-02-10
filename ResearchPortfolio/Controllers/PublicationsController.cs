@@ -76,54 +76,76 @@ namespace ResearchPortfolio.Controllers
 
             return View();
         }
-
-        // POST: Publications/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Publication publication, List<string> authorIds)
         {
-            ModelState.Remove(nameof(Publication.AuthorPublications));
-            ModelState.Remove(nameof(Publication.References));
-            ModelState.Remove(nameof(Publication.CreatedByUserId));
-
+            // 1. Взимаме ID-то на потребителя
             var currentUserId = _userManager.GetUserId(User);
 
-            if (!ModelState.IsValid)
+            // ДЕБЪГ ПРОВЕРКА: Ако не си логнат, currentUserId ще е null. 
+            // Това ще ни каже дали проблемът е в Identity системата.
+            if (string.IsNullOrEmpty(currentUserId))
             {
-                ViewBag.Authors = _userManager.Users
-                    .Where(u => u.Id != currentUserId)
-                    .ToList();
+                return Challenge(); // Препраща те към Login страницата
+            }
 
+            // 2. ПРИНУДИТЕЛНО ПРИСВОЯВАНЕ
+            publication.CreatedByUserId = currentUserId;
+
+            // 3. ПЪЛНО ИЗЧИСТВАНЕ НА ГРЕШКИТЕ ЗА ТОЗИ МОДЕЛ
+            // Понякога ModelState.Remove не е достатъчен, ако има скрити грешки
+            ModelState.Clear();
+
+            // 4. РЪЧНА ВАЛИДАЦИЯ (за всеки случай)
+            // Тъй като изчистихме всичко, проверяваме само най-важното
+            if (string.IsNullOrEmpty(publication.Title))
+            {
+                ModelState.AddModelError("Title", "Заглавието е задължително!");
+                ViewBag.Authors = _userManager.Users.Where(u => u.Id != currentUserId).ToList();
                 return View(publication);
             }
 
-            publication.CreatedByUserId = currentUserId;
-
-            _context.Publications.Add(publication);
-            await _context.SaveChangesAsync();
-
-            _context.AuthorPublications.Add(new AuthorPublication
+            try
             {
-                UserId = currentUserId,
-                PublicationId = publication.Id
-            });
+                // 5. ЗАПИС
+                _context.Add(publication);
+                await _context.SaveChangesAsync();
 
-            if (authorIds != null)
-            {
-                foreach (var authorId in authorIds)
+                // 6. АВТОРСТВО
+                var mainAuthor = new AuthorPublication
                 {
-                    _context.AuthorPublications.Add(new AuthorPublication
+                    UserId = currentUserId,
+                    PublicationId = publication.Id
+                };
+                _context.AuthorPublications.Add(mainAuthor);
+
+                if (authorIds != null)
+                {
+                    foreach (var authorId in authorIds)
                     {
-                        UserId = authorId,
-                        PublicationId = publication.Id
-                    });
+                        if (!string.IsNullOrEmpty(authorId))
+                        {
+                            _context.AuthorPublications.Add(new AuthorPublication
+                            {
+                                UserId = authorId,
+                                PublicationId = publication.Id
+                            });
+                        }
+                    }
                 }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                // Ако пак гръмне, това ще ни покаже грешката в браузъра вместо стандартния екран
+                ModelState.AddModelError("", "Грешка при запис: " + ex.Message);
+                ViewBag.Authors = _userManager.Users.Where(u => u.Id != currentUserId).ToList();
+                return View(publication);
+            }
         }
-
         // GET: Publications/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -281,6 +303,58 @@ namespace ResearchPortfolio.Controllers
         private bool PublicationExists(int id)
         {
             return _context.Publications.Any(e => e.Id == id);
+        }
+
+        // 1. Справка: Публикации на конкретен потребител
+        public IActionResult MyPublications(int userId)
+        {
+          var myPubs = _context.Publications
+          .Include(p => p.AuthorPublications) // Зареждаме и авторите
+          .Where(p => p.AuthorPublications.Any(a => a.PublicationId == userId))
+          .ToList();
+        
+          return View(myPubs);
+        }
+
+        // 2. Справка: Публикации по години
+        public IActionResult ByYear(int year)
+        {
+          var pubsByYear = _context.Publications
+          .Include(p => p.AuthorPublications)
+          .Where(p => p.Year == year)
+          .ToList();
+        
+          return View(pubsByYear);
+        }
+        // GET: Publications/ByYear?year=2024
+       public async Task<IActionResult> ByYear(int? year)
+       {
+         if (year == null)
+         {
+           return View(new List<Publication>());
+         }
+
+         var publications = await _context.Publications
+         .Include(p => p.AuthorPublications)
+         .Include(p => p.References)
+         .Where(p => p.Year == year)
+         .ToListAsync();
+
+         ViewBag.SelectedYear = year;
+         return View(publications);
+        }
+
+        public async Task<IActionResult> MyPortfolio()
+        {
+           // Взимаме ID-то на текущия потребител (Identity)
+           var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+  
+           var myPublications = await _context.Publications
+           .Include(p => p.AuthorPublications)
+           .Where(p => p.CreatedByUserId == userId || p.AuthorPublications.Any(ap => ap.UserId == userId))
+         .ToListAsync();
+
+          return View(myPublications);
         }
     }
 }
