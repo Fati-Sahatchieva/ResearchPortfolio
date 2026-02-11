@@ -29,3 +29,18 @@ body {
 .navbar.bg-primary .nav-item.dropdown > .nav-link.dropdown-toggle:focus {
     color: #18bc9c;
 }
+.banner-gradient {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1546');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+/* Ефект при посочване на картите */
+.card {
+    transition: transform 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-10px);
+}
