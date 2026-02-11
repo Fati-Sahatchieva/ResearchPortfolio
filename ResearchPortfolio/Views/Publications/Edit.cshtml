@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Edit";
 }
-
-<h1>Редактирай</h1>
+<br />
+<h2>Редактирай</h2>
 
 <h4>Публикация</h4>
 <hr />
@@ -40,19 +40,16 @@
                                 <input class="form-check-input"
                                        type="checkbox"
                                        name="authorIds"
-                                       value="@author.Id"
-                        @(ViewBag.SelectedAuthorIds.Contains(author.Id) ? "checked" : "") />
-
-                                <label class="form-check-label">
-                            @author.Email
-                                </label>
+                                       value="@author.Id" 
+                                       @(ViewBag.SelectedAuthorIds.Contains(author.Id) ? "checked" : "") />
+                                <label class="form-check-label">@author.Email</label>
                             </div>
                 }
             }
             <br />
             <div class="d-flex gap-2 mt-3">
                 <a asp-action="Index"
-                    class="btn btn-outline-secondary">
+                    class="btn btn-secondary">
                     Назад
                 </a>
                 <br />

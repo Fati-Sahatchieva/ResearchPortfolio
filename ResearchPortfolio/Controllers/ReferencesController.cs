@@ -16,9 +16,7 @@ namespace ResearchPortfolio.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReferencesController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+        public ReferencesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;

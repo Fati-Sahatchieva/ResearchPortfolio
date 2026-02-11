@@ -1,0 +1,83 @@
+﻿@model IEnumerable<ResearchPortfolio.Models.Publication>
+
+@{
+    ViewData["Title"] = "Reports";
+}
+<br />
+<h2 class="mb-4">Справка по потребител</h2>
+
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Потребител</label>
+        <select name="userId" class="form-select">
+            @foreach (var user in ViewBag.Users)
+            {
+                <option value="@user.Id" selected="@(user.Id == ViewBag.SelectedUserId)">
+                    @user.Email
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">От година</label>
+        <input type="number" name="fromYear" value="@ViewBag.FromYear" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">До година</label>
+        <input type="number" name="toYear" value="@ViewBag.ToYear" class="form-control"/>
+    </div>
+    <div class="col-md-2 align-self-end">
+        <button type="submit" class="btn btn-primary w-100">
+            Търси
+        </button>
+    </div>
+</form>
+
+<div class="mb-3">
+    <a asp-controller="Reports"
+       asp-action="ExportPublicationsCsv"
+       asp-route-userId="@ViewBag.SelectedUserId"
+       asp-route-fromYear="@ViewBag.FromYear"
+       asp-route-toYear="@ViewBag.ToYear"
+       class="btn btn-success">
+        Export CSV
+    </a>
+</div>
+<hr />
+
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Заглавие</th>
+                <th>Година</th>
+                <th>Автори</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var publication in Model)
+            {
+                <tr>
+                    <td>
+                        <a asp-controller="Publications" asp-action="Details" asp-route-id="@publication.Id">
+                            @publication.Title
+                        </a>
+                    </td>
+                    <td>@publication.Year</td>
+                    <td>
+                        @string.Join(", ", publication.AuthorPublications.Select(ap => ap.User.Email))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">
+        Няма намерени публикации.
+    </p>
+}
