@@ -3,10 +3,8 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Публикации</h1>
 <br />
-<br />
+<h2>Публикации</h2>
 <br />
 <p>
     <a asp-action="Create" class="btn btn-primary">Създай</a>
@@ -38,10 +36,15 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Year)
             </td>
-            <td>
+                <td class="d-flex justify-content-end gap-1">
                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-success">Редактирай</a> |
                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Детайли</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a>
+                <form asp-action="Delete" asp-route-id="@item.Id" method="post">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Сигурни ли сте, че искате да изтриете @item.Title?');">
+                        Изтрий
+                    </button>
+                </form>
+                @* <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Изтрий</a> *@
             </td>
         </tr>
 }

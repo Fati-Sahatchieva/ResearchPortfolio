@@ -255,6 +255,7 @@ namespace ResearchPortfolio.Controllers
 
             var publication = await _context.Publications
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (publication == null)
             {
                 return NotFound();

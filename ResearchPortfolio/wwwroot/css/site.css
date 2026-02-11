@@ -20,3 +20,12 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.navbar.bg-primary .nav-item.dropdown > .nav-link.dropdown-toggle {
+    color: #fff;
+}
+
+.navbar.bg-primary .nav-item.dropdown > .nav-link.dropdown-toggle:hover,
+.navbar.bg-primary .nav-item.dropdown > .nav-link.dropdown-toggle:focus {
+    color: #18bc9c;
+}
