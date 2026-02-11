@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResearchPortfolio.Data;
 using ResearchPortfolio.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ResearchPortfolio.Controllers
 {
+    [Authorize]
     public class PublicationsController : Controller
     {
         private readonly ApplicationDbContext _context;
