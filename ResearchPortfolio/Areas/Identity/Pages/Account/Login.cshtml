@@ -5,12 +5,11 @@
     ViewData["Title"] = "Влез";
 }
 <br />
-<h1>@ViewData["Title"]</h1>
+<h2>@ViewData["Title"]</h2>
 <div class="row">
     <div class="col-md-4">
         <section>
             <form id="account" method="post">
-                <h2></h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
@@ -32,6 +31,7 @@
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Влез</button>
                 </div>
+                <br />
                 <div>
                     <p>
                         <a id="forgot-password" asp-page="./ForgotPassword">Забравена парола?</a>
